@@ -63,7 +63,7 @@ async def run_forwarding_task(bot, message, frwd_id):
     await msg_edit(m, "<code>Processing...</code>") 
     temp.IS_FRWD_CHAT.append(i.TO)
     temp.lock[user] = temp.lock.get(user, {})
-    temp.lock[user][frwd_id] = True
+    temp.lock[user][frwd_id] = {'locked': True, 'bot': _bot}
     
     try:
         MSG = []
@@ -221,7 +221,7 @@ async def stop(client, user, frwd_id):
         pass 
     await db.rmve_frwd(user)
     temp.forwardings -= 1
-    temp.lock[user][frwd_id] = False 
+    temp.lock[user][frwd_id]['locked'] = False 
     del temp.CANCEL[user][frwd_id]
     
 async def send(bot, user, text):
@@ -280,7 +280,7 @@ def retry_btn(id):
 async def terminate_frwding(bot, m):
     user_id = m.from_user.id 
     frwd_id = m.message.reply_markup.inline_keyboard[0][0].callback_data.split('#')[-1]
-    temp.lock[user_id][frwd_id] = False
+    temp.lock[user_id][frwd_id]['locked'] = False
     temp.CANCEL[user_id][frwd_id] = True 
     await m.answer("Forwarding cancelled for this task!", show_alert=True)
           
